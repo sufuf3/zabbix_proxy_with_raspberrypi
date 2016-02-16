@@ -43,5 +43,3 @@ File Structure:
 |- hosts               # set IP
 |- site.yml            # master playbook
 
-Referance:
-http://blog.csdn.net/smallfish1983/article/details/37691023
