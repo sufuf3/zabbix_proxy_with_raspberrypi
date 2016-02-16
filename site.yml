@@ -1,0 +1,12 @@
+---
+- name: Install zabbix_proxy, zabbix_agent
+  hosts: raspberrypi
+  remote_user: pi
+  sudo: yes
+
+  roles:
+    - common
+    - mysql
+    - zabbix_proxy
+    - zabbix_agent
+    - ip_mac_port

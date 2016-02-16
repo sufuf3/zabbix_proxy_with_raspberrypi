@@ -1,0 +1,47 @@
+---
+- name: Check for previous installation
+  command: 'zabbix_proxy -V'
+  ignore_errors: True
+  register: zabbixproxy_exists
+
+- name: Download zabbix proxy
+  get_url: url=http://downloads.sourceforge.net/project/zabbix/ZABBIX%20Latest%20Stable/2.4.6/zabbix-2.4.6.tar.gz dest=/usr/src/zabbix-2.4.6.tar.gz
+  when: zabbixproxy_exists|failed
+
+- name: Extract archive
+  command: chdir=/usr/src /bin/tar xvf zabbix-2.4.6.tar.gz creates=/zabbix-2.4.6
+  when: zabbixproxy_exists|failed
+
+- name: Running ./configure for FFMPEG
+  command: chdir=/usr/src/zabbix-2.4.6/ {{ item }}
+  with_items: 
+    - ./configure --prefix=/usr --enable-proxy --with-net-snmp --with-mysql --with-ssh2 --enable-agent --with-libcurl --with-openipmi --with-libxml2 --with-unixodbc
+  when: zabbixproxy_exists|failed
+
+- name: Running "make" for FFMPEG
+  command: 'make chdir=/usr/src/zabbix-2.4.6/'
+  when: zabbixproxy_exists|failed
+
+- name: Running "make install" for FFMPEG
+  command: 'make install chdir=/usr/src/zabbix-2.4.6/'
+  when: zabbixproxy_exists|failed
+
+- name: import zabbix proxy schema
+  mysql_db: name=zabbix_proxy state=import target=/usr/src/zabbix-2.4.6/database/mysql/schema.sql
+  ignore_errors: yes
+  register: proxy_dbstatus
+  when: zabbixproxy_exists|failed
+
+# Template
+- name: copy proxy configuration
+  template: src=zabbix_proxy.conf.j2 dest=/usr/etc/zabbix_proxy.conf
+  when: zabbixproxy_exists|failed
+
+- name: copy proxy auto start
+  template: src=rc.local.j2 dest=/etc/rc.local
+  when: zabbixproxy_exists|failed
+
+- name: Running "Restart" for FFMPEG
+  command: '/usr/sbin/zabbix_proxy -c /usr/etc/zabbix_proxy.conf'
+  when: zabbixproxy_exists|failed
+

@@ -1,0 +1,47 @@
+Ansible Version 1.7.2
+Step of Install at Raspberry pi2: 
+1. 在raspberry pi 上灌OS、更新作業系統(update, upgrade)與IP、時區(raspi-config)設定
+2. 將raspberry pi 放置管舍(接上Router or switch)
+3. Ansible 一鍵安裝 (安裝Ansible 與載入本支程式) 
+    3.1 設定hosts 的IP
+    3.2 cd /home/pi    -->  git clone sudo git clone git@gitlab.sdnwifi.nctu.edu.tw:NOS_NOC/ip_mac_port.git
+    3.3 sudo ansible-playbook -i hosts site.yml --ask-pass
+4. 於zabbix Server 設定IP-MAC-Port 資料庫對應與設定zabbix server SNMP監控設備
+5. Enjoy 
+
+File Structure:
+/
+|- group_vars/
+|   |- raspberrypi     # 設定
+
+|- roles/
+|   |- common/tasks
+|   |   |- main.yml
+|   |- ip_mac_port/tasks
+|   |   |- main.yml
+|   |- mysql
+|   |   |- handlers
+|   |   |   |- main.yml
+|   |   |- tasks
+|   |   |   |- main.yml
+|   |   |- templates
+|   |   |   |- my.cnf.j2
+|   |- zabbix_agent
+|   |   |- handlers
+|   |   |   |- main.yml
+|   |   |- tasks
+|   |   |   |- main.yml
+|   |   |- templates
+|   |   |   |- zabbix_agentd.conf.j2
+|   |- zabbix_proxy
+|   |   |- tasks
+|   |   |   |- main.yml
+|   |   |- templates
+|   |   |   |- zabbix_proxy.conf.j2
+|   |   |   |- rc.local.j2
+
+|- hosts               # set IP
+|- site.yml            # master playbook
+
+Referance:
+http://blog.csdn.net/smallfish1983/article/details/37691023

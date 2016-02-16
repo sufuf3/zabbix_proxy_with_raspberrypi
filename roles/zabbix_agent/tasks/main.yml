@@ -1,0 +1,14 @@
+---
+- name: Check for previous installation
+  shell: "[ -f /usr/sbin/zabbix_agentd ]"
+  ignore_errors: True
+  register: zabbixagentd_exists
+
+- name: Install zabbix agent
+  apt: name=zabbix-agent state=present
+  notify: service zabbix-agent
+
+# Template
+- name: copy proxy configuration
+  template: src=zabbix_agentd.conf.j2 dest=/etc/zabbix/zabbix_agentd.conf
+  notify: service zabbix-agent

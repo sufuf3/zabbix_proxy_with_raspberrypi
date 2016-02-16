@@ -1,0 +1,8 @@
+---
+- name: Install netaddr
+  pip: name=netaddr
+
+- name: cp program
+  copy: src=/home/pi/ip_mac_port dest=/home/pi owner=root group=root mode=0755 
+
+- cron: name="set crontab" minute="*/10" user="root" job="python /home/pi/ip_mac_port/__main__.py  >> /var/log/nctu_python.log ; date >> /var/log/nctu_python.log"

@@ -1,0 +1,49 @@
+---
+- name: check if mysql db already exists
+  shell: "mysql -u zabbix -pzabbix -e 'SHOW DATABASES;' | grep zabbix_proxy"
+  ignore_errors: yes
+  register: proxy_dbstatus
+
+- name: install mysql db
+  apt: name=mysql-server,python-mysqldb,libmysqlclient-dev state=present
+  notify: service mysql
+  when: proxy_dbstatus|failed
+
+- name: install zabbix-proxy-mysql
+  apt: name=zabbix-proxy-mysql state=present
+  when: proxy_dbstatus|failed
+
+- name: 'Start Mysql Service'
+  action: service name=mysql state=started enabled=yes
+  when: proxy_dbstatus|failed
+
+- name: change my.cnf (for root password)
+  template: src=my.cnf.j2 dest=~/.my.cnf owner=root mode=0755
+  ignore_errors: yes
+  when: proxy_dbstatus|failed
+
+- name: Update MySQL root password for all root accounts
+  mysql_user: name=root host={{ item }} password=root_password 
+  with_items:
+    - "{{ ansible_hostname }}"
+    - 127.0.0.1
+    - ::1
+    - localhost
+  ignore_errors: yes
+  when: proxy_dbstatus|failed
+
+- name: create mysql database
+  mysql_db: name=zabbix_proxy state=present
+  when: proxy_dbstatus|failed
+  ignore_errors: yes
+
+- name: create mysql user
+  mysql_user: name=zabbix password=zabbix priv=zabbix_proxy.*:ALL login_user=root login_password=root_password
+  when: proxy_dbstatus|failed
+
+- name: Reload privilege tables
+  command: 'mysql -ne "{{ item }}"'
+  with_items:
+    - FLUSH PRIVILEGES
+  changed_when: False
+  ignore_errors: yes

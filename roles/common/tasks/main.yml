@@ -1,0 +1,26 @@
+---
+- name: Install packages
+  apt: update_cache=yes  
+       cache_valid_time=3600
+       name={{ item }}
+       state=present 
+  with_items:
+    - make
+    - build-essential
+    - fping
+    - sqlite3
+    - libsnmp-dev
+    - libcurl4-openssl-dev
+    - libiksemel-dev
+    - libsqlite3-dev
+    - unixodbc
+    - unixodbc-dev
+    - libxml2
+    - libxml2-dev
+    - libopenipmi-dev
+    - snmp
+    - snmp-mibs-downloader
+    - libssh2-1-dev
+    - snmpd
+    - libcurl4-openssl-dev
+    - libmysqlclient-dev
