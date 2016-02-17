@@ -1,10 +1,13 @@
 Ansible Version 1.7.2
 Step of Install at Raspberry pi2: 
 1. 在raspberry pi 上灌OS、更新作業系統(update, upgrade)與IP、時區(raspi-config)設定
+    1.1 sudo ssh-keygen -t dsa -f /root/.ssh/id_dsa -C "pi@140.113.220.86"
+    1.2 at ansible host, $ sudo scp /root/.ssh/id_dsa pi@140.113.220.83:/home/pi
+    1.3 sudo mv id_dsa /root/.ssh/authorized_keys
 2. 將raspberry pi 放置管舍(接上Router or switch)
 3. Ansible 一鍵安裝 (安裝Ansible 與載入本支程式) 
     3.1 設定hosts 的IP
-    3.2 cd /home/pi    -->  git clone sudo git clone git@gitlab.sdnwifi.nctu.edu.tw:NOS_NOC/ip_mac_port.git
+    3.2 cd /home/pi    -->  git clone sudo git clone git@gitlab.......
     3.3 sudo ansible-playbook -i hosts site.yml --ask-pass
 4. 於zabbix Server 設定IP-MAC-Port 資料庫對應與設定zabbix server SNMP監控設備
 5. Enjoy 
